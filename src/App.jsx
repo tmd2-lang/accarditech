@@ -45,6 +45,16 @@ const AccardiTech = () => {
     };
   }, []);
 
+  const closeDrawer = () => {
+    setIsDrawerOpen(false);
+    setTimeout(() => {
+      setIsFullScreen(false);
+      setFormStatus('idle');
+      setFormData({ fullName: '', firmName: '', email: '', challenge: '' });
+      setFormErrors({});
+    }, 500);
+  };
+
   const handleInquirySubmit = async (e) => {
     e.preventDefault();
     setFormStatus('loading');
@@ -340,7 +350,7 @@ const AccardiTech = () => {
       >
         <div 
           className="absolute inset-0 bg-black/40 backdrop-blur-sm"
-          onClick={() => setIsDrawerOpen(false)}
+          onClick={closeDrawer}
         />
         
         {/* Drawer Panel */}
@@ -358,7 +368,7 @@ const AccardiTech = () => {
                 {isFullScreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
               </button>
               <button 
-                onClick={() => { setIsDrawerOpen(false); setTimeout(() => setIsFullScreen(false), 500); }}
+                onClick={closeDrawer}
                 className="p-2 hover:bg-black/5 rounded-full transition-colors"
                 title="Close"
               >
@@ -367,31 +377,35 @@ const AccardiTech = () => {
             </div>
           </div>
           
-          <div className="flex-1 overflow-y-auto p-8">
+          <div className={`flex-1 overflow-y-auto p-8 ${formStatus === 'success' || formStatus === 'error' ? 'flex flex-col justify-center' : ''}`}>
             <div className="mx-auto w-full max-w-md transition-all duration-500">
-              <div className="mb-12">
-                <h2 className="text-3xl font-medium tracking-tight mb-4">Request Access</h2>
-                <p className="text-sm text-black/50 leading-relaxed">
-                  Provide your details below. We typically review all incoming inquiries within 24 hours to ensure operational alignment before taking a consultation.
-                </p>
-              </div>
-              
               {formStatus === 'success' ? (
                 <div className="flex flex-col items-center justify-center text-center space-y-4 py-20 animate-in fade-in zoom-in duration-500">
                   <div className="h-16 w-16 bg-black text-white rounded-full flex items-center justify-center mb-4 shadow-2xl">
                     <Activity size={24} className="animate-pulse" />
                   </div>
-                  <h3 className="text-2xl font-medium tracking-tight">Inquiry received.</h3>
-                  <p className="text-black/50 text-sm max-w-sm">We'll be in touch within 24 hours.</p>
+                  <h3 className="text-3xl font-medium tracking-tight">Inquiry received.</h3>
+                  <p className="text-black/50 text-sm max-w-sm mt-4">We'll be in touch within 24 hours to ensure operational alignment before taking a consultation.</p>
+                  <button onClick={closeDrawer} className="mt-8 text-[9px] font-bold uppercase tracking-[0.3em] bg-black text-white px-8 py-3 rounded-full hover:bg-black/80 transition-colors">
+                    Close
+                  </button>
                 </div>
               ) : formStatus === 'error' ? (
                 <div className="flex flex-col items-center justify-center text-center space-y-4 py-20 animate-in fade-in duration-300">
-                  <h3 className="text-2xl font-medium tracking-tight text-red-600">Something went wrong.</h3>
-                  <p className="text-black/50 text-sm max-w-sm">Please email us directly at contact@accarditech.com.</p>
-                  <button onClick={() => setFormStatus('idle')} className="mt-8 text-[9px] font-bold uppercase tracking-[0.2em] underline text-black/40 hover:text-black">Try Again</button>
+                  <h3 className="text-3xl font-medium tracking-tight text-red-600">Something went wrong.</h3>
+                  <p className="text-black/50 text-sm max-w-sm mt-4">Please email us directly at contact@accarditech.com.</p>
+                  <button onClick={() => setFormStatus('idle')} className="mt-8 text-[9px] font-bold uppercase tracking-[0.2em] border border-black/10 px-6 py-2 rounded-full hover:bg-black hover:text-white transition-colors">Try Again</button>
                 </div>
               ) : (
-                <form className="space-y-8 animate-in fade-in duration-300" onSubmit={handleInquirySubmit} noValidate>
+                <>
+                  <div className="mb-12 animate-in fade-in duration-300">
+                    <h2 className="text-3xl font-medium tracking-tight mb-4">Request Access</h2>
+                    <p className="text-sm text-black/50 leading-relaxed">
+                      Provide your details below. We typically review all incoming inquiries within 24 hours to ensure operational alignment before taking a consultation.
+                    </p>
+                  </div>
+                  
+                  <form className="space-y-8 animate-in fade-in duration-300" onSubmit={handleInquirySubmit} noValidate>
                   <div className="space-y-2">
                     <label className="text-[9px] font-bold uppercase tracking-[0.2em] text-black/40">Full Name</label>
                     <input type="text" value={formData.fullName} onChange={(e) => setFormData({...formData, fullName: e.target.value})} className={`w-full bg-transparent border-b ${formErrors.fullName ? 'border-red-500 text-red-600' : 'border-black/10 text-black'} py-3 text-sm focus:outline-none focus:border-black transition-colors`} placeholder="Jane Doe" />
@@ -434,6 +448,7 @@ const AccardiTech = () => {
                     )}
                   </button>
                 </form>
+                </>
               )}
             </div>
           </div>
